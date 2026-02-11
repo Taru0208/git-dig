@@ -1,0 +1,30 @@
+{
+  "name": "git-dig",
+  "version": "0.1.0",
+  "description": "Dig into your git history — find hotspots, coupling, code age, and churn",
+  "main": "src/index.js",
+  "bin": {
+    "git-dig": "src/cli.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "node --test src/*.test.js"
+  },
+  "keywords": [
+    "git",
+    "history",
+    "analysis",
+    "hotspot",
+    "coupling",
+    "churn",
+    "code-health",
+    "cli",
+    "developer-tools",
+    "zero-dependency"
+  ],
+  "author": "Taru <taru0208@proton.me> (https://github.com/Taru0208)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
