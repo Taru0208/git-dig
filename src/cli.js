@@ -2,7 +2,7 @@
 
 import { parseGitLog } from './parser.js';
 import { analyzeAll, hotspots, coupling, codeAge, authors, knowledgeSilos } from './analyze.js';
-import { formatText, formatMarkdown, formatJson } from './format.js';
+import { formatText, formatMarkdown, formatJson, formatGraph } from './format.js';
 
 const HELP = `
 git-dig — dig into your git history
@@ -16,6 +16,7 @@ Options:
   -n, --max <N>         Max commits to analyze (default: 5000)
   -m, --markdown        Output as Markdown
   -j, --json            Output as JSON
+  -g, --graph           Coupling graph as Mermaid diagram
       --hotspots        Show only hotspots
       --coupling        Show only temporal coupling
       --age             Show only code age
@@ -29,6 +30,7 @@ Examples:
   git-dig -s "6 months ago"       Last 6 months only
   git-dig --hotspots              Just the hotspots
   git-dig -m > report.md          Markdown report
+  git-dig -g > coupling.md        Mermaid coupling graph
 `.trim();
 
 function parseArgs(argv) {
@@ -52,6 +54,8 @@ function parseArgs(argv) {
         opts.format = 'markdown'; break;
       case '-j': case '--json':
         opts.format = 'json'; break;
+      case '-g': case '--graph':
+        opts.format = 'graph'; break;
       case '--hotspots':
         opts.mode = 'hotspots'; break;
       case '--coupling':
@@ -123,6 +127,7 @@ function output(analysis, format) {
   switch (format) {
     case 'markdown': console.log(formatMarkdown(analysis)); break;
     case 'json': console.log(formatJson(analysis)); break;
+    case 'graph': console.log(formatGraph(analysis)); break;
     default: console.log(formatText(analysis)); break;
   }
 }

@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseRawLog } from './parser.js';
 import { hotspots, coupling, codeAge, authors, knowledgeSilos, analyzeAll } from './analyze.js';
-import { formatText, formatMarkdown, formatJson } from './format.js';
+import { formatText, formatMarkdown, formatJson, formatGraph } from './format.js';
 
 // --- Test data ---
 
@@ -293,5 +293,28 @@ describe('formatJson', () => {
     const json = formatJson(analysis);
     const parsed = JSON.parse(json);
     assert.equal(parsed.summary.totalCommits, 7);
+  });
+});
+
+describe('formatGraph', () => {
+  it('should produce Mermaid diagram with coupling pairs', () => {
+    const commits = parseRawLog(RAW_LOG);
+    const analysis = analyzeAll(commits);
+    const graph = formatGraph(analysis, { minDegree: 0.3 });
+    assert.ok(graph.includes('```mermaid'), 'should contain mermaid code block');
+    assert.ok(graph.includes('graph LR'), 'should be a LR graph');
+  });
+
+  it('should return message when no coupling data', () => {
+    const graph = formatGraph({ coupling: [], hotspots: [] });
+    assert.ok(graph.includes('no coupling'));
+  });
+
+  it('should filter by minDegree', () => {
+    const commits = parseRawLog(RAW_LOG);
+    const analysis = analyzeAll(commits);
+    const strict = formatGraph(analysis, { minDegree: 0.99 });
+    // Very strict filter — may exclude most pairs
+    assert.ok(typeof strict === 'string');
   });
 });

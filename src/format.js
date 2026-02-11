@@ -165,6 +165,63 @@ export function formatMarkdown(analysis) {
   return lines.join('\n');
 }
 
+/**
+ * Generate a Mermaid graph from coupling data and hotspot sizes.
+ * Nodes = files (sized by commit count), edges = temporal coupling.
+ */
+export function formatGraph(analysis, { minDegree = 0.3, maxNodes = 30 } = {}) {
+  const { coupling, hotspots } = analysis;
+  if (!coupling || coupling.length === 0) return '(no coupling data to graph)';
+
+  // Build node set from coupling pairs that meet threshold
+  const strongCoupling = coupling.filter(c => c.degree >= minDegree);
+  if (strongCoupling.length === 0) return '(no coupling above threshold)';
+
+  const nodeSet = new Set();
+  for (const c of strongCoupling) {
+    nodeSet.add(c.fileA);
+    nodeSet.add(c.fileB);
+  }
+
+  // Limit nodes
+  const nodes = [...nodeSet].slice(0, maxNodes);
+  const nodeIds = new Map();
+  for (const n of nodes) {
+    const id = n.replace(/[^a-zA-Z0-9]/g, '_');
+    nodeIds.set(n, id);
+  }
+
+  // Hotspot lookup for commit counts
+  const commitMap = new Map();
+  if (hotspots) {
+    for (const h of hotspots) commitMap.set(h.path, h.commits);
+  }
+
+  const lines = ['graph LR'];
+
+  // Nodes
+  for (const n of nodes) {
+    const id = nodeIds.get(n);
+    const label = n.length > 40 ? '...' + n.slice(-37) : n;
+    const commits = commitMap.get(n);
+    const suffix = commits ? ` (${commits})` : '';
+    lines.push(`  ${id}["${label}${suffix}"]`);
+  }
+
+  lines.push('');
+
+  // Edges
+  for (const c of strongCoupling) {
+    const idA = nodeIds.get(c.fileA);
+    const idB = nodeIds.get(c.fileB);
+    if (!idA || !idB) continue;
+    const pct = Math.round(c.degree * 100);
+    lines.push(`  ${idA} -- "${c.coupled}× ${pct}%" --- ${idB}`);
+  }
+
+  return '```mermaid\n' + lines.join('\n') + '\n```';
+}
+
 export function formatJson(analysis) {
   return JSON.stringify(analysis, null, 2);
 }
