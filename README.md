@@ -19,6 +19,7 @@ git-dig ./path/to/repo          # analyze specific repo
 git-dig -s "6 months ago"       # last 6 months only
 git-dig --hotspots              # just the hotspots
 git-dig -m > report.md          # export as markdown
+git-dig -g > coupling.md        # Mermaid coupling graph
 git-dig -j | jq '.hotspots'    # pipe JSON to jq
 ```
 
@@ -48,6 +49,7 @@ Files touched by only one author. Risk: if that person leaves, no one knows the 
 | `-n, --max <N>` | Max commits to analyze (default: 5000) |
 | `-m, --markdown` | Output as Markdown |
 | `-j, --json` | Output as JSON |
+| `-g, --graph` | Coupling graph as Mermaid diagram |
 | `--hotspots` | Show only hotspots |
 | `--coupling` | Show only temporal coupling |
 | `--age` | Show only code age |
