@@ -1,5 +1,7 @@
 # git-dig
 
+![Tests](https://github.com/Taru0208/git-dig/actions/workflows/test.yml/badge.svg)
+
 Dig into your git history. Find hotspots, temporal coupling, code age, knowledge silos, and author patterns — all from `git log`.
 
 Zero dependencies. Works with any git repository.
